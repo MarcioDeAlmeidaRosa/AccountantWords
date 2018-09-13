@@ -23,7 +23,6 @@ namespace AccountantWords.Entities
         //TODO: VERIFICAR
         public DateTime PubDate { get { return _PubDate.StringToDateTime(); } }
 
-        [Verifiable]
         [XmlElement(ElementName = "creator", Namespace = "http://purl.org/dc/elements/1.1/")]
         public string[] Creator { get; set; }
 

@@ -10,16 +10,21 @@ namespace AccountantWords.Tools
 {
     public class CheckVerifiable
     {
-        public static Dictionary<object, IList<string>> GetPhrasesByToic(IList<object> obj)
+        public static Dictionary<object, IList<string>> GetPhrasesByToic(IList<object> obj, string[] disregardWords)
         {
             if (obj == null)
                 throw new ArgumentNullException("Topic list not sent");
             var TopicPhrases = new Dictionary<object, IList<string>>();
-            ((List<object>)obj).ForEach(o => TopicPhrases.Add(o, GetTopicPhrases(o)));
+            foreach(var ob in obj)
+            {
+                var phrases = GetTopicPhrases(ob);
+                phrases = DisregardWords(phrases, disregardWords);
+                TopicPhrases.Add(ob, phrases);
+            }
             return TopicPhrases;
         }
 
-        private static IList<string> GetTopicPhrases(object obj)
+        private static string[] GetTopicPhrases(object obj)
         {
             if (obj == null) return null;
             List<string> phrases = new List<string>();
@@ -39,11 +44,11 @@ namespace AccountantWords.Tools
                         {
                             if (item is string)
                                 if (Verifiable)
-                                    phrases.Add(RemoveNoText(item.ToString()));
+                                    phrases.Add(RemoveHtmlNotation(item.ToString()));
                                 else
                                 {
                                     var ret = GetTopicPhrases(item);
-                                    if ((Verifiable) && (ret.Count > 0))
+                                    if ((Verifiable) && (ret.Length > 0))
                                         phrases.AddRange(GetTopicPhrases(item));
                                 }
                         }
@@ -53,17 +58,17 @@ namespace AccountantWords.Tools
                         if (property.PropertyType.Assembly == objType.Assembly)
                         {
                             var ret = GetTopicPhrases(propValue);
-                            if ((Verifiable) && (ret.Count > 0))
+                            if ((Verifiable) && (ret.Length > 0))
                                 phrases.AddRange(ret);
                         }
                         else
                             if (Verifiable)
-                            phrases.Add(RemoveNoText(propValue.ToString()));
+                            phrases.Add(RemoveHtmlNotation(propValue.ToString()));
                     }
                 }
                 catch { }
             }
-            return phrases;
+            return phrases.ToArray();
         }
 
         private static bool IsVerifiedPProperty(PropertyInfo property)
@@ -71,7 +76,7 @@ namespace AccountantWords.Tools
             return (property.GetCustomAttributes(true).Where(a => a.GetType() == typeof(Verifiable)).FirstOrDefault() != null);
         }
 
-        private static string RemoveNoText(string text)
+        private static string RemoveHtmlNotation(string text)
         {
             if (text == null)
                 throw new ArgumentNullException("text to replace not sent");
@@ -80,6 +85,18 @@ namespace AccountantWords.Tools
             string replacement = string.Empty;
             string result = Regex.Replace(input, pattern, replacement);
             return result;
+        }
+
+        private static string[] DisregardWords(string[] phrase, string[] disregardWords)
+        {
+            List<string> _words = new List<string>();
+            phrase.ToList().ForEach(p => _words.AddRange(p.Split(' ')));
+            disregardWords.ToList().ForEach(d => {
+                var regex = new Regex(d, RegexOptions.IgnoreCase);
+                var listaRemover = _words.FindAll(pala => pala.ToUpper().Equals(d));
+                listaRemover.ToList().ForEach(r => _words.Remove(r));
+            });
+            return _words.ToArray();
         }
     }
 }

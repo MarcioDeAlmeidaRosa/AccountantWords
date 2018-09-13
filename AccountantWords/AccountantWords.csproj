@@ -8,10 +8,11 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>AccountantWords</RootNamespace>
     <AssemblyName>AccountantWords</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,6 +48,7 @@
     <Compile Include="Entities\Channel.cs" />
     <Compile Include="Entities\RSS.cs" />
     <Compile Include="Entities\Topic.cs" />
+    <Compile Include="Extensions\JoinCollection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Extensions\TransformDateTime.cs" />
